@@ -2,6 +2,7 @@ package com.example.movieapp.activities
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -13,6 +14,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.movieapp.R
 import com.example.movieapp.utils.Utils
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 
 
@@ -22,6 +24,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     private lateinit var navController: NavController
     private lateinit var drawer: DrawerLayout
     private lateinit var navView: NavigationView
+    private lateinit var bottomNavigationView: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,8 +35,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         setActionBar()
         setNavGraph()
         setDrawerNavigation()
+        setBottomNavNavigation()
         drawerMenuCustomActions()
-        changeDrawerState()
+        changeUiVisibility()
     }
     private fun setActionBar() {
         val toolbar = findViewById<Toolbar>(R.id.app_toolbar)
@@ -63,6 +67,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
+    private fun setBottomNavNavigation() {
+        bottomNavigationView = findViewById(R.id.bottom_nav_view)
+        bottomNavigationView.setupWithNavController(navController)
+    }
     private fun drawerMenuCustomActions() {
         navView.menu.findItem(R.id.conditionFragment).setOnMenuItemClickListener {
             closeDrawer()
@@ -76,13 +84,15 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     private fun openDrawer() {
         drawer.openDrawer(GravityCompat.START)
     }
-    private fun changeDrawerState() {
+    private fun changeUiVisibility() {
         navController.addOnDestinationChangedListener(listener = { _, destination, _ ->
             //set in case app asked for verify auth, signIn page drawer will be locked
             if (destination.id== R.id.signInFragment || destination.id == R.id.conditionFragment) {
                 drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                bottomNavigationView.visibility = View.GONE
             } else if (drawer.getDrawerLockMode(GravityCompat.START) != DrawerLayout.LOCK_MODE_UNLOCKED) {
                 drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                bottomNavigationView.visibility = View.VISIBLE
             }
         })
     }
